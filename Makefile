@@ -4,7 +4,7 @@ TEMPLATE_NAME ?= react-tw-ts
 FILE_NAME ?= helloooo
 PRACTICE_FOLDER = /c/Users/nosoy/Escritorio/programacion/practice
 MSG ?= "Update Content"
-DESC ?= 
+DESC ?= "Updated content"
 
 
 # Vite React, Tailwind, Typescript & Sass Bootstrap Set-up
@@ -41,7 +41,7 @@ fork:
 	git clone https://github.com/HTMLSlander/$(REPO_GIT).git && code $(REPO_GIT)
 
 deploy:
-	git add . && git commit -m "${MSG}" -m "${DESC}" && git push origin main
+	git add . && git commit -m ${MSG} -m ${DESC} && git push origin main
 
 add:
 	git add .
