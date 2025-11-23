@@ -8,6 +8,7 @@ class AmbientMixer {
     this.ui = new UI();
     this.presetManager = null;
     this.timer = null;
+    this.masterVolume = 100;
     this.currentSoundState = {};
     this.isInitialized = false;
   }
@@ -15,7 +16,6 @@ class AmbientMixer {
     try {
       // Initialize UI
       this.ui.init();
-
       // Render sound cards using our sound data
       this.ui.renderSoundCards(sounds);
       this.setupEventListeners();
@@ -23,9 +23,12 @@ class AmbientMixer {
       this.loadAllSounds();
       // this.soundManager.setVolume("rain", 30);
       // this.soundManager.playSound("rain");
+      sounds.forEach((sound) => {
+        this.currentSoundState[sound.id] = 0;
+      });
       this.isInitialized = true;
     } catch (error) {
-      console.error("Fialed to initialize app: ", error);
+      console.error("Failed to initialize app: ", error);
     }
   }
 
@@ -42,9 +45,33 @@ class AmbientMixer {
         const soundId = e.target.dataset.sound;
         const volume = +e.target.value;
         this.setSoundVolume(soundId, volume);
-        console.log(soundId, volume);
       }
     });
+    const masterVolumeSlider = document.getElementById("masterVolume");
+    if (masterVolumeSlider) {
+      masterVolumeSlider.addEventListener("input", (e) => {
+        if (e.target.classList.contains("volume-slider")) {
+          const volume = +e.target.value;
+          this.setMasterVolume(volume);
+        }
+      });
+    }
+    if (this.ui.playPauseButton) {
+      this.ui.playPauseButton.addEventListener("click", () => {
+        this.toggleAllSounds();
+      });
+    }
+    if (this.ui.resetButton) {
+      this.ui.resetButton.addEventListener("click", () => {
+        this.resetAll();
+      });
+    }
+  }
+  resetAll() {
+    this.soundManager.stopAll();
+    this.masterVolume = 100;
+    this.ui.resetUI();
+    console.log("All sounds and settings reset");
   }
   loadAllSounds() {
     sounds.forEach((sound) => {
@@ -63,18 +90,100 @@ class AmbientMixer {
     }
 
     if (audio.paused) {
-      this.soundManager.setVolume(soundId, 50);
+      // Get current slider value
+      const card = document.querySelector(`[data-sound="${soundId}"]`);
+      const slider = card.querySelector(".volume-slider");
+      let volume = +slider.value;
+      if (volume === 0) {
+        volume = 50;
+        this.ui.updateVolumeDisplay(soundId, volume);
+      }
+      this.soundManager.setVolume(soundId, volume);
       await this.soundManager.playSound(soundId);
       this.ui.updateSoundPlayButton(soundId, true);
     } else {
       await this.soundManager.pauseSound(soundId);
       this.ui.updateSoundPlayButton(soundId, false);
     }
+    this.updateMainPlayButtonState();
+  }
+
+  toggleAllSounds() {
+    if (this.soundManager.isPlaying) {
+      this.soundManager.pauseAll();
+      this.ui.updateMainPlayButton(false);
+      sounds.forEach((sound) => {
+        this.ui.updateSoundPlayButton(sound.id, false);
+      });
+    } else {
+      for (const [soundId, audio] of this.soundManager.audioElements) {
+        const card = document.querySelector(`[data-sound="${soundId}"]`);
+        const slider = card?.querySelector(".volume-slider");
+
+        if (slider) {
+          let volume = +slider.value;
+          if (volume === 0) {
+            volume = 50;
+            slider.value = 50;
+            this.ui.updateVolumeDisplay(soundId, 50);
+          }
+          this.currentSoundState[soundId] = volume;
+
+          const effectiveVolume = (volume * this.masterVolume) / 100;
+          audio.volume = effectiveVolume / 100;
+          this.ui.updateSoundPlayButton(soundId, true);
+        }
+      }
+
+      this.soundManager.playAll();
+      this.setMasterVolume(50);
+
+      this.ui.updateMainPlayButton(true);
+    }
   }
 
   setSoundVolume(soundId, volume) {
-    this.soundManager.setVolume(soundId, volume);
+    const effectiveVolume = (volume * this.masterVolume) / 100;
+    const audio = this.soundManager.audioElements.get(soundId);
+    if (audio) {
+      audio.volume = effectiveVolume / 100;
+    }
+    // this.soundManager.setVolume(soundId, volume);
     this.ui.updateVolumeDisplay(soundId, volume);
+  }
+  setMasterVolume(volume) {
+    this.masterVolume = volume;
+    const masterVolumeValue = document.querySelector(".master-volume-bar");
+    masterVolumeValue.previousElementSibling.value = volume;
+    masterVolumeValue.querySelector(".volume-bar-fill").style.width =
+      `${volume}%`;
+    this.applyMasterVolumeToAll();
+  }
+  applyMasterVolumeToAll() {
+    for (const [soundId, audio] of this.soundManager.audioElements) {
+      if (!audio.paused) {
+        const card = document.querySelector(`[data-sound=${soundId}]`);
+        const slider = card?.querySelector(".volume-slider");
+        if (slider) {
+          const individualVolume = +slider.value;
+          const effectiveVolume = (individualVolume * this.masterVolume) / 100;
+          audio.volume = effectiveVolume / 100;
+        }
+      }
+    }
+  }
+
+  updateMainPlayButtonState() {
+    let anySoundsPlaying = false;
+    for (const [soundId, audio] of this.soundManager.audioElements) {
+      if (!audio.paused) {
+        anySoundsPlaying = true;
+        break;
+      }
+    }
+
+    this.soundManager.isPlaying = anySoundsPlaying;
+    this.ui.updateMainPlayButton(anySoundsPlaying);
   }
 }
 

@@ -71,8 +71,6 @@ export class UI {
     });
   }
 
-  // Update play/pause button for individual sound
-
   updateSoundPlayButton(soundId, isPlaying) {
     const card = document.querySelector(`[data-sound="${soundId}"]`);
 
@@ -92,20 +90,69 @@ export class UI {
   }
   updateVolumeDisplay(soundId, volume) {
     const card = document.querySelector(`[data-sound="${soundId}"]`); // Select according to the attribute value
+    const volumeBarFill = card.querySelector(".volume-bar-fill");
+    const slider = card.querySelector(".volume-slider");
     if (!card) {
       throw "No card found";
     }
-    const volumeValue = card.querySelector(".volume-value");
-    if (volumeValue) {
-      volumeValue.textContent = volume;
+
+    if (!volumeBarFill) {
+      throw "No volumeBarFill found";
     }
-    const volumeBarFill = card.querySelector(".volume-bar-fill");
-    if (volumeBarFill) {
-      volumeBarFill.style.width = `${volume}%`;
+    if (!slider) {
+      throw "No slider found";
     }
-    const slider = card.querySelector(".volume-slider");
-    if (slider) {
-      slider.value = volume;
+    slider.value = `${volume}`;
+    volumeBarFill.style.width = `${volume}%`;
+  }
+
+  updateMasterVolumeDisplay(volume) {
+    console.log(this.master);
+    const slider = volumeBarFill.querySelector(".volume-bar-fill");
+    console.log(slider);
+    if (!volumeBarFill) {
+      throw "No volumeBarFill found";
     }
+    if (!slider) {
+      throw "No slider found";
+    }
+    this.masterVolumeSlider.value = `${volume}`;
+    volumeBarFill.style.width = `${volume}%`;
+  }
+
+  updateMainPlayButton(isPlaying) {
+    const icon = this.playPauseButton.querySelector("i");
+    if (isPlaying) {
+      icon.classList.remove("fa-play");
+      icon.classList.add("fa-pause");
+    } else {
+      icon.classList.add("fa-play");
+      icon.classList.remove("fa-pause");
+    }
+  }
+
+  resetUI() {
+    const sliders = document.querySelectorAll(".volume-slider");
+    const playButtons = document.querySelectorAll(".play-btn");
+
+    playButtons.forEach((btn) => {
+      btn.value = 0;
+      const soundId = btn.dataset.sound;
+      this.updateVolumeDisplay(soundId, 0);
+    });
+
+    playButtons.forEach((button) => {
+      button.firstElementChild.classList.remove("fa-pause");
+      button.firstElementChild.classList.add("fa-play");
+    });
+
+    const cards = document.querySelectorAll(".sound-card");
+    cards.forEach((card) => {
+      card.classList.remove("fa-playing");
+    });
+
+    this.updateMainPlayButton(false);
+
+    this.masterVolumeSlider.value = 0;
   }
 }
