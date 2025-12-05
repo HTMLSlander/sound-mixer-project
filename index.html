@@ -22,15 +22,20 @@
     class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white transition-all duration-500"
   >
     <!-- Header -->
-    <header class="container mx-auto px-4 py-6">
-      <nav class="flex justify-between items-center">
-        <div class="flex items-center space-x-2">
-          <i class="fas fa-music text-2xl text-purple-400"></i>
+    <header
+      class="h-1/2 sm:h-[200px] container mx-auto sm:mt-8 px-2 py-4 flex justify-center items-center"
+    >
+      <nav class="flex justify-between items-center mt-14">
+        <div class="flex flex-col mx-auto items-center space-x-2">
           <h1
-            class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+            class="text-3xl md:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent text-center"
           >
-            Ambient Mixer
+            Welcome to the Ambient Sound Mixer
           </h1>
+          <p class="text-xl text-slate-200 text-center mt-4">
+            Feel free to play around with these beautifully sequentialized sound
+            effects :D
+          </p>
         </div>
 
         <!-- Theme Toggle -->
@@ -38,15 +43,15 @@
           type="button"
           onclick=""
           id="themeToggle"
-          class="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-300"
+          class="absolute top-3 right-3 h-[48px] w-[48px] z-50 rounded-lg bg-yellow-100 hover:bg-white/80 transition-all duration-300"
         >
-          <i class="fas fa-sun text-yellow-300"></i>
+          <i class="fas fa-sun text-yellow-600"></i>
         </button>
       </nav>
     </header>
 
     <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
+    <main class="container mx-auto px-4 py-2 sm:py-8">
       <!-- Controls Section -->
       <section class="mb-8">
         <div class="flex flex-wrap gap-4 justify-center items-center">

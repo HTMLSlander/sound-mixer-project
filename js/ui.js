@@ -42,7 +42,7 @@ export class UI {
             <p class="text-xs opacity-70">${sound.description}</p>
           </div>
         </div>
-        <button type="button" class="play-btn w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-300 flex items-center justify-center" data-sound="${sound.id}">
+        <button type="button" class="play-btn w-[40px] h-[40px] rounded-full bg-white/10 hover:bg-white/80 hover:text-black transition-all duration-300 flex items-center justify-center" data-sound="${sound.id}">
           <i class="fas fa-play text-sm"></i>
         </button>
       </div>
@@ -61,6 +61,21 @@ export class UI {
     </div>`;
 
     return card;
+  }
+
+  createCustomPresetButton(name, presetId) {
+    const button = document.createElement("button");
+    button.className =
+      "custom-preset-btn bg-white/10 px-4 py-2 rounded-lg transition-all duration-300 relative group";
+    button.dataset.preset = presetId;
+    button.innerHTML = `<i class="fas fa-star mr-2 text-yellow-400"></i>
+    ${name}
+    <button type="button" class="delete-preset absolute -top-2 -right-2 w-6 h-6
+    bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity
+    duration-300" data-preset="${presetId}">
+    <i class="fas fa-times text-xs text-white"></i>
+    </button>`;
+    return button;
   }
 
   renderSoundCards(sounds) {
@@ -155,4 +170,19 @@ export class UI {
 
     this.masterVolumeSlider.value = 0;
   }
+  showModal() {
+    this.modal.classList.remove("hidden");
+    this.modal.classList.remove("flex");
+    document.getElementById("presetName").focus();
+  }
+  hideModal() {
+    this.modal.classList.remove("hidden");
+    this.modal.classList.remove("flex");
+    document.getElementById("presetName").value = "";
+  }
+  addCustomPreset(name, presetId) {
+    const button = this.createCustomPresetButton(name, presetId);
+    this.customPresetsContainer.appendChild(button);
+  }
+  setActivePreset() {}
 }
