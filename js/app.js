@@ -93,6 +93,7 @@ class AmbientMixer {
     const confirmSaveButton = document.getElementById("confirmSave");
     if (confirmSaveButton) {
       confirmSaveButton.addEventListener("click", () => {
+        this.saveCurrentPreset();
         this.ui.hideModal();
       });
     }
@@ -230,7 +231,7 @@ class AmbientMixer {
   loadPreset(presetKey, custom = false) {
     let preset;
     if (custom) {
-      preset = this.presetManager.loadPreset(presetKey);
+      preset = this.presetManager.loadPreset(presetKey.dataset.preset);
     } else {
       preset = defaultPresets[presetKey];
     }
@@ -257,6 +258,9 @@ class AmbientMixer {
     }
     this.soundManager.isPlaying = true;
     this.ui.updateMainPlayButton(true);
+    if (presetKey) {
+      this.ui.setActivePreset(presetKey);
+    }
   }
   showSavePresetModal() {
     const hasActiveSounds = Object.values(this.currentSoundState).some(

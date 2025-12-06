@@ -149,6 +149,9 @@ export class UI {
   resetUI() {
     const sliders = document.querySelectorAll(".volume-slider");
     const playButtons = document.querySelectorAll(".play-btn");
+    const volumeBarFill = document.querySelector(
+      ".master-volume-bar .volume-bar-fill"
+    );
 
     playButtons.forEach((btn) => {
       btn.value = 0;
@@ -169,14 +172,15 @@ export class UI {
     this.updateMainPlayButton(false);
 
     this.masterVolumeSlider.value = 0;
+    volumeBarFill.style.width = this.masterVolumeSlider.value;
   }
   showModal() {
     this.modal.classList.remove("hidden");
-    this.modal.classList.remove("flex");
+    this.modal.classList.add("flex");
     document.getElementById("presetName").focus();
   }
   hideModal() {
-    this.modal.classList.remove("hidden");
+    this.modal.classList.add("hidden");
     this.modal.classList.remove("flex");
     document.getElementById("presetName").value = "";
   }
@@ -184,5 +188,20 @@ export class UI {
     const button = this.createCustomPresetButton(name, presetId);
     this.customPresetsContainer.appendChild(button);
   }
-  setActivePreset() {}
+  setActivePreset(presetKey) {
+    document
+      .querySelectorAll(".preset-btn, custom-preset-btn")
+      .forEach((btn) => {
+        btn.classList.remove("preset-active");
+      });
+    const presetValue =
+      typeof presetKey === "string" ? presetKey : presetKey?.dataset?.preset;
+
+    const activeButton = document.querySelector(
+      `.preset-btn[data-preset="${presetValue}"], .custom-preset-btn[data-preset="${presetValue}"]`
+    );
+    if (activeButton) {
+      activeButton.classList.add("preset-active");
+    }
+  }
 }
